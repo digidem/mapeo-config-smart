@@ -1,0 +1,12 @@
+{
+    "icon": "otro",
+    "fields": [
+      "nombre_original"
+    ],
+    "name": "Otro",
+    "tags": {},
+    "geometry": [
+        "point"
+    ],
+    "sort": 99
+}

@@ -1,0 +1,17 @@
+{
+  "name": "empty-config",
+  "version": "1.0.0",
+  "description": "Empty Mapeo config",
+  "dependencies": {
+    "mapeo-settings-builder": "^3.0.0",
+    "mkdirp": "^0.5.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "basename=\"${npm_package_name}-v${npm_package_version}\"; mkdirp build/${basename}; mapeo-settings build -l 'en' -o build/${basename}.mapeosettings && tar -C \"build/${basename}\" -xf build/${basename}.mapeosettings",
+    "test": "mapeo-settings lint"
+  },
+  "author": "Your Name",
+  "license": "UNLICENSED",
+  "private": true
+}
