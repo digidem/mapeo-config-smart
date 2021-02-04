@@ -1,5 +1,4 @@
 const fs = require('fs')
-const mkdirp = require('mkdirp')
 const path = require('path')
 const yauzl = require('yauzl')
 const logger = require('./logger')
@@ -9,16 +8,13 @@ function throwError (sourceFile, error) {
   process.exit(1)
 }
 
-module.exports = function (sourceFile, dest) {
-  const destPath = path.join(process.cwd(), dest)
-  const madeDir = mkdirp.sync(destPath)
-
+module.exports = function unzipPackage (sourceFile, destPath, cb = () => {}) {
   if (typeof sourceFile === 'undefined') {
     logger.error('Please provide path to SMART Patrol Package')
     process.exit(1)
   }
 
-  logger.log(`Extracting ${sourceFile} to ${destPath} ...`)
+  logger.log(`Extracting ${sourceFile} to ${destPath}`)
 
   yauzl.open(sourceFile, { lazyEntries: true }, function (err, zipfile) {
     if (err) throwError(sourceFile, err)
@@ -42,7 +38,7 @@ module.exports = function (sourceFile, dest) {
 
           const destFile = path.join(destPath, entry.fileName)
           const writeStream = fs.createWriteStream(destFile)
-          logger.log(`Extracting ${destFile} ...`)
+          logger.log(`Extracting ${entry.fileName}`)
 
           readStream.pipe(writeStream)
         })
@@ -51,6 +47,12 @@ module.exports = function (sourceFile, dest) {
 
     zipfile.on('end', function () {
       logger.ok(`SMART Patrol Package extraction complete`)
+
+      // Run the next step after unzipping via a callback.
+      // This might be better implemented by making this entire
+      // module use async syntax, but using the callback function
+      // is the easier implementation for now.
+      cb()
     })
 
     zipfile.on('error', function (error) {
