@@ -1,5 +1,5 @@
 {
-  "dataset_id": "mapeo",
-  "projectKey": "2c714e9b06e3c101c9e13325f065d39c3bf806284fae9b0fbe5a553eaaeeb064",
-  "name": "Empty Config"
+  "dataset_id": "mapeo-config-smart",
+  "name": "Mapeo-SMART integration",
+  "projectKey": "69fd0efcf35a64a9f9ea4146ab5188e217c2cf2aa7a8ac915f9474cf1a2fd631"
 }
