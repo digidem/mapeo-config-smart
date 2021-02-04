@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "Empty Mapeo config",
   "dependencies": {
+    "chalk": "^4.1.0",
     "commander": "^7.0.0",
     "mapeo-settings-builder": "^3.0.0",
     "mkdirp": "^1.0.4",
+    "winston": "^3.3.3",
     "yauzl": "^2.10.0"
   },
   "devDependencies": {},
