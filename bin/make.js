@@ -4,7 +4,9 @@ const mkdirp = require('mkdirp')
 const unzip = require('./unzip')
 const parseXml = require('./parse-xml')
 const logger = require('./logger')
-const copyIcons = require('./icons')
+const makeDefaultsJson = require('./make-defaults.js')
+const makePresets = require('./make-presets.js')
+const makeIcons = require('./make-icons')
 
 // We're making these assumptions about the SMART data model file:
 // - that the file will always be present
@@ -51,6 +53,8 @@ module.exports = (sourceFile, destPath) => {
 
   // Create presets, icons, and metadata for mapeo-settings-builder
   function generate (data) {
-    copyIcons(tempPath, destPath, data.presets)
+    makeDefaultsJson(destPath, data.presets)
+    makePresets(destPath, data.presets)
+    makeIcons(tempPath, destPath, data.presets)
   }
 }

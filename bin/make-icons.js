@@ -13,7 +13,7 @@ const ICON_FOLDER = 'icons'
 const ICON_100PX_SUFFIX = '-100px'
 const ICON_24PX_SUFFIX = '-24px'
 
-function copyIcons (sourcePath, destPath, presets = []) {
+function makeIcons (sourcePath, destPath, presets = []) {
   logger.log('Copying icons ...')
 
   for (let i = 0; i < presets.length; i++) {
@@ -43,4 +43,4 @@ function copyFileSync (file, dest) {
   }
 }
 
-module.exports = copyIcons
+module.exports = makeIcons
