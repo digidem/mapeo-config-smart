@@ -3,6 +3,8 @@ const path = require('path')
 const mkdirp = require('mkdirp')
 const unzip = require('./unzip')
 const parseXml = require('./parse-xml')
+const logger = require('./logger')
+const copyIcons = require('./icons')
 
 // We're making these assumptions about the SMART data model file:
 // - that the file will always be present
@@ -12,21 +14,43 @@ const parseXml = require('./parse-xml')
 //      file name ever be changeable during the export procedure?
 // - that there are no other model files in addition to, or override this
 const SMART_MODEL_FILE = 'cm_model.xml'
+const TEMPORARY_DIR = '_temp'
 
+// This is copied from mapeo-settings-builder's generateProjectKey()
+// which we might want to re-use if we want to generate `metadata.json`
+// dynamically based on certain inputs. e.g. consider creating a
+// pseudorandom project key which are consistent when seeded with
+// the same inputs, so that the same SMART config generates the same
+// projectt key.
 function generateProjectKey () {
   return crypto.randomBytes(32).toString('hex')
 }
 
-module.exports = (sourceFile, destDir) => {
-  const destPath = path.join(process.cwd(), destDir)
-  const madeDir = mkdirp.sync(destPath)
+module.exports = (sourceFile, destPath) => {
+  // Create destination and temporary folders, if necessary
+  // TODO: Clean existing folders
+  const tempPath = path.join(process.cwd(), TEMPORARY_DIR)
 
-  unzip(sourceFile, destPath, parse)
-
-  function parse () {
-    parseXml(path.join(destPath, SMART_MODEL_FILE))
+  const madeDestPath = mkdirp.sync(destPath)
+  if (madeDestPath) {
+    logger.log(`Creating destination directory ${destPath}`)
   }
-  // convert files
-  // clean output folder
-  // copy to folder structure + make files
+
+  const madeTempPath = mkdirp.sync(tempPath)
+  if (madeTempPath) {
+    logger.log(`Creating temporary directory ${tempPath}`)
+  }
+
+  // Unzip the SMART Patrol package
+  unzip(sourceFile, tempPath, parse)
+
+  // Parse the SMART Configurable Model
+  function parse () {
+    parseXml(path.join(tempPath, SMART_MODEL_FILE), generate)
+  }
+
+  // Create presets, icons, and metadata for mapeo-settings-builder
+  function generate (data) {
+    copyIcons(tempPath, destPath, data.presets)
+  }
 }
