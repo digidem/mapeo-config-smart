@@ -7,9 +7,11 @@ const winston = require('winston')
 
 // API:
 // logger.info() - logs OK (with green color)
+// logger.ok() - alias for logger.info()
 // logger.warn() - logs warning (with yellow color)
 // logger.error() - logs error (with red color)
 // logger.verbose() - logs extra info (gray)
+// logger.log() - alias for logger.verbose()
 
 // By default, only warnings, errors, and info logs are output to console
 // but you can change this by setting the environment variable DEBUG=true
