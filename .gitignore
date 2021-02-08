@@ -2,3 +2,8 @@ build
 node_modules
 _temp
 icons/*
+!icons/.gitkeep
+presets/*
+!presets/.gitkeep
+fields/*
+!fields/.gitkeep
