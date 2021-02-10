@@ -1,11 +1,13 @@
 const crypto = require('crypto')
+const fs = require('fs')
 const path = require('path')
 const mkdirp = require('mkdirp')
 const unzip = require('./unzip')
 const parseXml = require('./parse-xml')
 const logger = require('./logger')
-const makeDefaultsJson = require('./make-defaults.js')
-const makePresets = require('./make-presets.js')
+const makeDefaultsJson = require('./make-defaults')
+const makePresets = require('./make-presets')
+const makeFields = require('./make-fields')
 const makeIcons = require('./make-icons')
 
 // We're making these assumptions about the SMART data model file:
@@ -26,6 +28,20 @@ const TEMPORARY_DIR = '_temp'
 // projectt key.
 function generateProjectKey () {
   return crypto.randomBytes(32).toString('hex')
+}
+
+// Write out parsed XML data to JSON in the tempPath for inspection
+function writeDebugFile (bool = false, data, tempPath) {
+  // Only run when the condition is true (first argument to this function)
+  if (!true) return
+
+  try {
+    const file = path.join(tempPath, `cm_model.json`)
+    fs.writeFileSync(file, JSON.stringify(data.json, null, 2))
+    logger.verbose('Exported cm_model.json to temporary directory')
+  } catch (err) {
+    logger.warn(`Unable to create cm_model.json: ${err}`)
+  }
 }
 
 module.exports = (sourceFile, destPath) => {
@@ -53,8 +69,12 @@ module.exports = (sourceFile, destPath) => {
 
   // Create presets, icons, and metadata for mapeo-settings-builder
   function generate (data) {
+    // Export converted JSON in debug mode
+    writeDebugFile(process.env.debug === 'true', data, tempPath)
+
     makeDefaultsJson(destPath, data.presets)
     makePresets(destPath, data.presets)
+    makeFields(destPath, data.fields)
     makeIcons(tempPath, destPath, data.presets)
   }
 }
