@@ -5,7 +5,7 @@ const logger = require('./logger')
 const FIELDS_FOLDER = 'fields'
 
 function makeFields (destPath, fields) {
-  logger.log(`Writing fields ...`)
+  logger.log(`Converting fields ...`)
 
   // Write out each field definition
   fields.map((field) => {
@@ -23,7 +23,7 @@ function makeFields (destPath, fields) {
     }
   })
 
-  logger.ok('Finished writing fields')
+  logger.ok('Converted fields')
 }
 
 module.exports = makeFields

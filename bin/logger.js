@@ -31,6 +31,9 @@ const color = {
   verbose: 'gray'
 }
 const formatter = winston.format.printf(({ level, message }) => {
+  if (level === 'info') {
+    return chalk[color[level]]`${symbols[level]} ${chalk.reset(message)}`
+  }
   return chalk[color[level]]`${symbols[level]} ${message}`
 })
 

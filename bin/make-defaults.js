@@ -33,7 +33,7 @@ function makeDefaultsJson (destPath, presets) {
     // One must not merely write a JavaScript object, so stringify first
     // Pretty print the JSON so it's easier for human review
     fs.writeFileSync(file, JSON.stringify(data, null, 2))
-    logger.ok(`Wrote defaults.json`)
+    logger.ok(`Created defaults.json`)
   } catch (err) {
     logger.error(`Error writing defaults.json: ${err}`)
   }

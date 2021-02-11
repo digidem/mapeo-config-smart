@@ -6,7 +6,7 @@ const { getPresetName } = require('./util')
 const PRESET_FOLDER = 'presets'
 
 function makePresets (destPath, presets) {
-  logger.log(`Writing presets ...`)
+  logger.log(`Converting presets ...`)
 
   // Write out each preset
   presets.map((preset) => {
@@ -24,7 +24,7 @@ function makePresets (destPath, presets) {
     }
   })
 
-  logger.ok('Finished writing presets')
+  logger.ok('Converted presets')
 }
 
 module.exports = makePresets

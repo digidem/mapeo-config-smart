@@ -40,7 +40,7 @@ function writeDebugFile (bool = false, data, tempPath) {
     fs.writeFileSync(file, JSON.stringify(data.json, null, 2))
     logger.verbose('Exported cm_model.json to temporary directory')
   } catch (err) {
-    logger.warn(`Unable to create cm_model.json: ${err}`)
+    logger.warn(`Warning: unable to create cm_model.json: ${err}`)
   }
 }
 

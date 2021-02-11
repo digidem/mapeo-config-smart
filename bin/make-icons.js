@@ -14,12 +14,12 @@ const ICON_100PX_SUFFIX = '-100px'
 const ICON_24PX_SUFFIX = '-24px'
 
 function makeIcons (sourcePath, destPath, presets = []) {
-  logger.log('Copying icons ...')
+  logger.log('Exporting icons ...')
 
   for (let i = 0; i < presets.length; i++) {
     const preset = presets[i]
     if (!preset.icon) {
-      logger.warn(`No icon is available for preset ${preset.name} (skipping)`)
+      logger.warn(`Warning: no icon is defined for preset ${preset.name} (skipping)`)
       continue
     }
 
@@ -31,7 +31,7 @@ function makeIcons (sourcePath, destPath, presets = []) {
     copyFileSync(file, dest2)
   }
 
-  logger.ok('Finished copying icons')
+  logger.ok('Exported icons')
 }
 
 function copyFileSync (file, dest) {

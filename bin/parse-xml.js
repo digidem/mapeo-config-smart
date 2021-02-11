@@ -159,6 +159,7 @@ function getPresetIterator (presets, node) {
   }
 
   if (node.node && Array.isArray(node.node)) {
+    logger.warn(`Warning: parent level category '${node.name[0].$.value}' will only export its children`)
     node.node.reduce(getPresetIterator, presets)
   }
 
@@ -330,8 +331,9 @@ function getDefaultLanguage (cm) {
  * the structure of a tree selection type for debug purposes
  */
 function logFieldTree (attrConfig) {
+  logger.warn(`Warning: tree-select field '${attrConfig.$.attributeKey}' will be flattened`)
   const archyOutput = attrConfig.treeNode.reduce(archyFieldTreeOutput, {})
-  archyOutput.label = `Parsing tree select field for ${chalk.yellow( attrConfig.$.attributeKey)}:`
+  archyOutput.label = `Flattening this tree for field '${chalk.yellow(attrConfig.$.attributeKey)}':`
   logger.log(archy(archyOutput))
 }
 
