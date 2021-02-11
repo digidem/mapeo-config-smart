@@ -109,6 +109,9 @@ function getPresets (cm) {
  * https://github.com/openstreetmap/iD/tree/b9dc749a19f49931ff81ef10d19813b18694a5be/data/presets
  * https://github.com/openstreetmap/iD/blob/b9dc749a19f49931ff81ef10d19813b18694a5be/data/presets/schema/preset.json
  *
+ * Additional schema as documented by the Mapeo project:
+ * https://github.com/digidem/mapeo-schema/blob/master/docs/preset.md
+ *
  * @param {Array} presets - accumulator array of preset definitions
  * @param {Object} node - SMART ConfigurableModel node
  * @returns {Array} the current state of the array for the next iteration
@@ -164,8 +167,9 @@ function getPresetIterator (presets, node) {
 
 /**
  * Called recursively on the SMART ConfigurableModel data structure to build
- * a list of fields. Fuekd schema are defined by the iD editor:
- * https://github.com/openstreetmap/iD/blob/b9dc749a19f49931ff81ef10d19813b18694a5be/data/presets/schema/field.json
+ * a list of fields. Mapeo does not use the same field schema as iD editor.
+ * Instead, refer to  this:
+ * https://github.com/digidem/mapeo-schema/blob/master/docs/field.md
  *
  * @param {Array} fields - accumulator array of field definitions
  * @param {Object} node - SMART ConfigurableModel node
@@ -176,19 +180,6 @@ function getFields (cm) {
     logger.verbose('No attributes detected, skipping field generation')
     return []
   }
-
-  /**
-   * Note:
-   * there are five types of fields in SMART:
-   *  - Numeric
-   *  - List (aka "multiselect")
-   *  - Tree (todo: what is the difference between tree and list?)
-   *  - Text
-   *  - Boolean
-   * List and tree attributes are defined in the attributeConfig property.
-   * Numerical fields are not, so we need to collect those from each node.
-   *  - numerical fields may have 'minValue' or 'maxValue'
-   */
 
   const attributeConfigs = cm.attributeConfig.reduce((lookupObj, attr) => {
     const key = attr.$.attributeKey
@@ -202,32 +193,78 @@ function getFields (cm) {
 
     const field = {
       key,
-      label: attr.name[0].$.value,
-      // default:,
-      // options:, // Look up on attributeConfigs
-      // placeholder:,
-      // prerequisiteTag
+      label: attr.name[0].$.value
     }
 
     // Set type
+    /**
+     * Note:
+     * there are five types of fields in SMART:
+     *  - Numeric
+     *  - List (aka "select one")
+     *  - Tree (select one, but choices are in a nested tree)
+     *  - Text
+     *  - Boolean
+     * List and tree attributes are defined in the attributeConfig property.
+     * Numerical fields are not, so we need to collect those from each node.
+     *  - numerical fields may have 'minValue' or 'maxValue'
+     * Text and boolean fields are not defined, so we assume the format based
+     * on the name of the type
+     */
     switch (attr.$.type) {
       case 'NUMERIC':
         field.type = 'number'
+        // Set min and max values for number types
+        // Note: the field properties used in Mapeo are named differently
+        // than in iD editor
+        if (attr.$.minValue) {
+          field.min_value = Number.parseInt(attr.$.minValue, 10)
+        }
+        if (attr.$.maxValue) {
+          field.max_value = Number.parseInt(attr.$.maxValue, 10)
+        }
+        break
+      case 'BOOLEAN':
+        field.type = 'select_one'
+
+        // Manually define "yes" and "no" selections for boolean types
+        // Although the iD editor specifies a "check" type, this is
+        // not suppored by Mapeo. We implement this with a select_one type
+        field.options = [
+          {
+            label: "Yes",
+            value: true
+          },
+          {
+            label: "No",
+            value: false
+          }
+        ]
+        break
+      case 'LIST':
+        field.type = 'select_one'
+        field.options = attributeConfigs[key].listItem.map((item) => {
+          return {
+            label: item.name[0].$.value,
+            value: item.$.keyRef
+          }
+        })
+        break
+      // Trees are the most complex selection types in SMART. The selection
+      // is made after navigating a nested list of choices. In some cases
+      // it's possible for SMART to have defined a flat, single-level tree
+      // even though it works as a list.
+      // The way this will work is to create multiple select fields that
+      // have a prerequisite on the previous one.
+      case 'TREE':
+        logFieldTree(attributeConfigs[key])
+        field.type = 'select_one'
+        field.options = flattenTreeSelect(attributeConfigs[key])
         break
       case 'TEXT':
       default:
         field.type = 'text'
         break
-    }
-
-    // Set min and max values for number types
-    if (field.type === 'number') {
-      if (attr.$.minValue) {
-        field.minValue = Number.parseInt(attr.$.minValue, 10)
-      }
-      if (attr.$.maxValue) {
-        field.maxValue = Number.parseInt(attr.$.maxValue, 10)
-      }
     }
 
     return field
@@ -285,4 +322,64 @@ function getDefaultLanguage (cm) {
   }
 
   return defaultLanguage
+}
+
+
+/**
+ * Similar code to logging the tree structure of presets, this visualizes
+ * the structure of a tree selection type for debug purposes
+ */
+function logFieldTree (attrConfig) {
+  const archyOutput = attrConfig.treeNode.reduce(archyFieldTreeOutput, {})
+  archyOutput.label = `Parsing tree select field for ${chalk.yellow( attrConfig.$.attributeKey)}:`
+  logger.log(archy(archyOutput))
+}
+
+function archyFieldTreeOutput (tree, node) {
+  const label = node.name[0].$.value
+
+  let child
+  // Color code nodes that are top-level categories
+  if (node.children && Array.isArray(node.children)) {
+    child = node.children.reduce(archyFieldTreeOutput, {
+      label: chalk.magenta`${label}`
+    })
+  } else {
+    child = {
+      label: chalk.cyan`${label}`
+    }
+  }
+
+  if (!tree.nodes) {
+    tree.nodes = []
+  }
+  tree.nodes.push(child)
+
+  return tree
+}
+
+/**
+ * Flattens a tree-select configuration into a single list of selections
+ * for use with Mapeo
+ *
+ * @param {Object} attrConfig
+ * @returns {Array}
+ */
+function flattenTreeSelect (attrConfig) {
+  return attrConfig.treeNode.reduce(flattenTreeSelectIterator, [])
+}
+
+function flattenTreeSelectIterator (list, node) {
+  // If this is a top-level item with children, traverse child nodes
+  if (node.children && Array.isArray(node.children)) {
+    node.children.reduce(flattenTreeSelectIterator, list)
+  } else {
+    // Otherwise, create the select object and push to the list
+    list.push({
+      label: node.name[0].$.value,
+      value: node.$.keyRef
+    })
+  }
+
+  return list
 }
