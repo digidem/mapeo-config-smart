@@ -1,0 +1,8 @@
+{
+  "icon": "other",
+  "name": "Other",
+  "geometry": ["point"],
+  "tags": {},
+  "fields": ["name"],
+  "matchScore": 0.1
+}
