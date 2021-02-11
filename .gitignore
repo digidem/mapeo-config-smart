@@ -5,5 +5,7 @@ icons/*
 !icons/.gitkeep
 presets/*
 !presets/.gitkeep
+!presets/point.json
 fields/*
 !fields/.gitkeep
+!fields/name.json
