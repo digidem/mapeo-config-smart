@@ -1,17 +1,26 @@
 {
-  "name": "empty-config",
-  "version": "1.0.0",
-  "description": "Empty Mapeo config",
+  "name": "mapeo-config-smart",
+  "version": "0.1.0",
+  "description": "Mapeo config for SMART",
   "dependencies": {
-    "mapeo-settings-builder": "^3.0.0",
-    "mkdirp": "^0.5.1"
+    "archy": "^1.0.0",
+    "chalk": "^4.1.0",
+    "commander": "^7.0.0",
+    "mapeo-settings-builder": "^3.2.2",
+    "mapnik": "^4.5.5",
+    "mkdirp": "^1.0.4",
+    "winston": "^3.3.3",
+    "xml2js": "^0.4.23",
+    "yauzl": "^2.10.0"
   },
   "devDependencies": {},
   "scripts": {
+    "convert": "node ./bin/index",
+    "convert:debug": "DEBUG=true node ./bin/index",
     "build": "basename=\"${npm_package_name}-v${npm_package_version}\"; mkdirp build/${basename}; mapeo-settings build -l 'en' -o build/${basename}.mapeosettings && tar -C \"build/${basename}\" -xf build/${basename}.mapeosettings",
     "test": "mapeo-settings lint"
   },
-  "author": "Your Name",
-  "license": "UNLICENSED",
+  "author": "Lou Huang <louh@louhuang.com>",
+  "license": "MIT",
   "private": true
 }

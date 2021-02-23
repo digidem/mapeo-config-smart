@@ -1,2 +1,13 @@
 build
 node_modules
+_temp
+icons/*
+!icons/.gitkeep
+!icons/other-24px.svg
+!icons/other-100px.svg
+presets/*
+!presets/.gitkeep
+!presets/point.json
+fields/*
+!fields/.gitkeep
+!fields/name.json

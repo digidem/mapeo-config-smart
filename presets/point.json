@@ -1,12 +1,8 @@
 {
-    "icon": "otro",
-    "fields": [
-      "nombre_original"
-    ],
-    "name": "Otro",
-    "tags": {},
-    "geometry": [
-        "point"
-    ],
-    "sort": 99
+  "icon": "other",
+  "name": "Other",
+  "geometry": ["point"],
+  "tags": {},
+  "fields": ["name"],
+  "matchScore": 0.1
 }

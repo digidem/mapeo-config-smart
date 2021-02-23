@@ -1,0 +1,6 @@
+{
+  "key": "name",
+  "type": "text",
+  "label": "Name",
+  "appearance": "singleline"
+}

@@ -1,7 +1,0 @@
-{
-    "key": "nombre_original",
-    "type": "text",
-    "universal": true,
-    "label": "Nombre Original",
-    "placeholder": "Nombre común y nombre en dialecto"
-}
